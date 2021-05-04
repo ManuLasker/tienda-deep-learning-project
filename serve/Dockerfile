@@ -1,4 +1,4 @@
-FROM tiangolo/uvicorn-gunicorn-fastapi:python3.7
+FROM continuumio/miniconda3
 
 
 LABEL maintainer="emanuel.afanador@koombea.com"
@@ -24,7 +24,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends nginx \
 COPY config/nginx.conf /opt/ml/input/config/nginx.conf
 
 # Copy requiremets to container
-# COPY config /opt/ml/input/config
+COPY config/environment /opt/ml/input/config/environment
+# Install environment configuration
+RUN pip install -r /opt/ml/input/config/environment/requirements.txt
 
 # Define importants env variables
 ENV PYTHONUNBUFFERED=TRUE
