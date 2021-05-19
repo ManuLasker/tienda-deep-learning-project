@@ -1,6 +1,6 @@
 import torch
 
-from typing import List
+from typing import List, Tuple
 from app.dl_model.model.base_predictor import BasePredictor
 
 class YoloV5Predictor(BasePredictor):
@@ -14,6 +14,7 @@ class YoloV5Predictor(BasePredictor):
     
     def __init__(self):
         super().__init__()
+        assert self.model is not None, "Predictor was not set properly"
         
     @classmethod
     def get_stride(cls) -> torch.Tensor:
@@ -80,12 +81,26 @@ class YoloV5Predictor(BasePredictor):
             torch.Tensor: stack of meshgrid between arange of nx and ny points.
         """
         yv, xv = torch.meshgrid([torch.arange(ny), torch.arange(nx)])
-        return torch.stack((xv, yv), 2).view(1, 1, ny, nx, 2).float()
+        return torch.stack((xv, yv), 2).view(1, 1, ny, nx, 2).float()        
         
-    def predict(self, image_tensor:torch.Tensor):
+    def predict(self, image_tensor:torch.Tensor,
+                **kwargs) -> List[Tuple[float, float, float, float, float, str]]:
+        """get predictions of image tensor of shape [C, H, W].
+
+        Args:
+            image_tensor (torch.Tensor): Image tensor in RGB format, with dimensions
+                                        [Nc, Height, Width], where Nc is the number of channels.
+            **kwargs (kwargs): Keyword arguments to pass to prediction post process output method,
+                        Process head output for yolov5 model and apply non max suppression to
+                        get detections with shape: [nx6 (x1, y1, x2, y2, conf, class_name)].
+
+        Returns:
+            [List[Tuple[float, float, float, float, float, str]]]: list of detections with dimensions of
+                [nx6 (x1, y1, x2, y2, conf, class_name)]
+        """
         import app.dl_model.model.prediction as prediction
         self.model.eval()
         with torch.no_grad():
-            pred = self.model(image_tensor.unsqueeze(0))
-        return prediction.YoloV5Prediction(self, output_tensor=pred).processed_output
+            preds = self.model(image_tensor.unsqueeze(0))
+        return prediction.YoloV5Prediction(self, output_tensor=preds).get_tensor_detections(**kwargs)
     
