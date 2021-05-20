@@ -36,25 +36,26 @@ class YoloV5Predictor(BasePredictor):
             class_names (List[str]): List of class names for detected products.
             anchors (List[List[int]]): List of anchors given by model trained configs.
         """
-        # number of classes 
-        cls.nc = len(class_names)
-        # number of layers
-        cls.nl = len(anchors)
-        # number of outputs per anchors
-        cls.no = cls.nc + 5
-        # set up anchors and class_names for class
-        cls.class_names = class_names
-        anchors_temp = torch.tensor(anchors, dtype=torch.float32).view(cls.nl, -1, 2)
-        cls.anchors = anchors_temp.clone()
-        # set model_path and load model
-        cls.set_model_path(model_path)
-        cls.load_model()
-        # set up the model configuration for post processing prediction
-        cls.anchor_grid = anchors_temp.clone().view(cls.nl, 1, -1, 1, 1, 2)
-        cls.stride = cls.get_stride()
-        cls.anchors /= cls.stride.view(-1, 1, 1)
-        # check anchors order
-        cls.check_anchor_order()
+        if not cls.model:
+            # number of classes 
+            cls.nc = len(class_names)
+            # number of layers
+            cls.nl = len(anchors)
+            # number of outputs per anchors
+            cls.no = cls.nc + 5
+            # set up anchors and class_names for class
+            cls.class_names = class_names
+            anchors_temp = torch.tensor(anchors, dtype=torch.float32).view(cls.nl, -1, 2)
+            cls.anchors = anchors_temp.clone()
+            # set model_path and load model
+            cls.set_model_path(model_path)
+            cls.load_model()
+            # set up the model configuration for post processing prediction
+            cls.anchor_grid = anchors_temp.clone().view(cls.nl, 1, -1, 1, 1, 2)
+            cls.stride = cls.get_stride()
+            cls.anchors /= cls.stride.view(-1, 1, 1)
+            # check anchors order
+            cls.check_anchor_order()
         
     @classmethod
     def check_anchor_order(cls):
@@ -155,9 +156,10 @@ class ClassifierPredictor(BasePredictor):
             product_external_ids (List[int]): List of products ids for database.
                 class names and product external ids must match, product_id: product_name:
         """
-        # set model_path and load model
-        cls.set_model_path(model_path)
-        cls.load_model()
-        # set Attributes
-        cls.class_names = class_names
-        cls.product_external_ids = product_external_ids
+        if not cls.model:
+            # set model_path and load model
+            cls.set_model_path(model_path)
+            cls.load_model()
+            # set Attributes
+            cls.class_names = class_names
+            cls.product_external_ids = product_external_ids
