@@ -18,5 +18,5 @@ class BasePredictor(ABC):
             cls.model_path = path
             
     @abstractmethod
-    def predict(self, image):
+    def predict(self, *args, **kwargs):
         ...
