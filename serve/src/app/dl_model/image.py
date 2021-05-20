@@ -1,8 +1,7 @@
 import torch
 import numpy as np
 import app.dl_model.model.predictor as predictor
-from typing import Tuple, Union, List
-from PIL import Image
+from typing import Tuple, Union, List, Dict, Any
 from app.dl_model.utils import ImageUtilities
 from app.dl_model.detection import DetectedObject, DetectedObjects
 
@@ -39,15 +38,31 @@ class YoloInput:
         return cls(numpy_image, new_shape)
     
     @classmethod
-    def from_base64_image(cls, base64_image: str, new_size: Tuple[int, int]) -> None:
-        pass
+    def from_base64_image(cls, base64_image: str,
+                          new_shape: Union[Tuple[int, int], int] = (224, 224)) -> 'YoloInput':
+        """Create a yolo input object from a base64 encoded string image.
+        
+        Args:
+            base64_image (str): base64 encoded string image.
+            new_shape (Tuple[int, int]): new size for preprocessing.
+            
+        Returns:
+            [YoloInput]: yolo input object. with image and new size.
+        """
+        # Load BGR numpy image array
+        numpy_image = ImageUtilities._load_image_from_base64_image(base64_image)
+        # validate new_size 
+        if isinstance(new_shape, int):
+            new_shape = (new_shape, new_shape)
+        # return yolo input object
+        return cls(numpy_image, new_shape)
     
     def detect_products(self, conf_thres: float = 0.25,
                               iou_thres: float = 0.45,
                               classes: List[str] = None,
                               agnostic: bool = False,
                               multi_label: bool = False,
-                              second_classifier: bool = False) -> None:
+                              second_classifier: bool = False) -> Dict[str, Any]:
         """Apply detection yolo model for input yolo, and if second classsifier
         is True then apply second classifier to yolo detections.
 
@@ -55,7 +70,7 @@ class YoloInput:
             conf_thres (float, optional): confidence threshold for nms algorithm. Defaults to 0.25.
             iou_thres (float, optional): intersection or union threshold for nms algorithm. Defaults to 0.45.
             classes (List[str], optional): class list to filter by classes. Defaults to None.
-            agnostic (bool, optional): TODO. Defaults to False.
+            agnostic (bool, optional): to add agnostic. Defaults to False.
             multi_label (bool, optional): habilitate multiple labels per box. Defaults to False.
         """
         # Instantiate yolo model predictor.
