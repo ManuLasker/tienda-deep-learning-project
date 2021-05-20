@@ -1,17 +1,22 @@
 from pydantic import BaseModel
 from typing import Tuple, List
-from typing_extensions import TypedDict
 
-class DetectedProduct(TypedDict):
-    """Detected product type dictionary, this contains information
+class DetectedProduct(BaseModel):
+    """Detected product model, this contains information
     about the detected product such as product name and the bounding box
     dimensions as follow:
     {
+        product_id: id
         product_name: str,
+        detection_index: int,
+        confidence: float,
         bounding_box: [x0, y0, x1, y1]
     }
     """
+    product_id: int
     product_name: str
+    detection_index: int
+    confidence: float
     bounding_box: Tuple[int, int, int, int]
 
 class InvocationRequest(BaseModel):
@@ -28,12 +33,17 @@ class InvocationResponse(BaseModel):
     this will respond an image in base64 string format encoded, and 
     the detected products information as follows:
     {
-        image: str,
-        detected_products: {
-            product_name: str,
-            bounding_box: [x0, y0, x1, y1]
-        }
+        total_classes: int
+        detected_products: [
+            {
+                product_id: id
+                product_name: str,
+                detection_index: int,
+                confidence: float,
+                bounding_box: [x0, y0, x1, y1]
+            }
+        ]
     }
     """
-    image: str # output image with bounding boxes
+    total_classes: int
     detected_products: List[DetectedProduct]    
