@@ -1,6 +1,6 @@
 import torch
-
-from typing import List, Tuple
+from collections import namedtuple
+from typing import Dict, List, Tuple
 from app.dl_model.model.base_predictor import BasePredictor
 
 class YoloV5Predictor(BasePredictor):
@@ -104,3 +104,60 @@ class YoloV5Predictor(BasePredictor):
             preds = self.model(image_tensor.unsqueeze(0))
         return prediction.YoloV5Prediction(self, output_tensor=preds).get_tensor_detections(**kwargs)
     
+    
+class ClassifierPredictor(BasePredictor):
+    """Classifier Predictor to handle classification model.
+    """
+    # Class Attributes
+    model_path = None
+    model = None
+    class_names = None
+    product_external_ids = None
+    
+    def __init__(self):
+        super().__init__()
+        assert self.model is not None, "Predictor was not set properly"
+        
+    def predict(self, image_tensor:torch.Tensor):
+        self.model.eval()
+        with torch.no_grad():
+            preds:torch.Tensor = self.model(image_tensor.unsqueeze(0))
+        return self.post_process(preds.softmax(1))
+    
+    def post_process(self, preds: torch.Tensor):
+        """post process the predictions of the predictor to a dictionary
+        with keys 'class_name':, 'conf': 
+
+        Args:
+            preds (torch.Tensor): torch Tensor for prediction.
+
+        Returns:
+            [ClassifierPrediction]: NamedTuple containing the information about the prediction.
+        """
+        ClassifierPrediction = namedtuple("ClassifierPrediction",
+                                         ["product_id", "class_name",
+                                          "conf", "detection_index"])
+        conf, index = preds.max(dim=1)
+        return ClassifierPrediction(product_id=self.product_external_ids[index.item()],
+                                    class_name=self.class_names[index.item()],
+                                    conf=conf.item(),
+                                    detection_index=index.item())
+
+    @classmethod
+    def setup_model(cls, model_path: str,
+                    class_names: List[str], 
+                    product_external_ids: List[int]) -> None:
+        """Set up classification model for prediction.
+
+        Args:
+            model_path (str): str /path/to/model.
+            class_names (List[str]): List of class names for classification model.
+            product_external_ids (List[int]): List of products ids for database.
+                class names and product external ids must match, product_id: product_name:
+        """
+        # set model_path and load model
+        cls.set_model_path(model_path)
+        cls.load_model()
+        # set Attributes
+        cls.class_names = class_names
+        cls.product_external_ids = product_external_ids
