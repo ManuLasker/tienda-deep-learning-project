@@ -1,1 +1,1 @@
-from app.route_model.models import InvocationRequest, InvocationResponse
+from app.route_model.models import InvocationRequest, InvocationResponse, PingResponse
