@@ -2,7 +2,7 @@ import torch
 import torchvision.transforms as T
 import numpy as np
 import cv2
-from typing import Tuple, Union
+from typing import Any, Dict, Tuple, Union
 from base64 import b64decode, b64encode
 from io import BytesIO
 from PIL import Image
@@ -163,3 +163,15 @@ class ImageUtilities:
         """
         if isinstance(image, torch.Tensor): return T.ToPILImage()(image)
         elif isinstance(image, np.ndarray): return Image.fromarray(image)
+        
+    @staticmethod
+    def process_fastai_model(image: Union[np.ndarray, Image.Image],
+                             new_shape: Tuple[int, int]) -> torch.Tensor: 
+        transform = T.Compose([
+            T.ToTensor(),
+            T.Resize(size=new_shape),
+            T.Normalize(mean=ImageUtilities.mean,
+                        std=ImageUtilities.std)
+        ]) 
+        image:torch.Tensor = transform(image)
+        return image.float()
