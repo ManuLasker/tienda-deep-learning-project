@@ -82,7 +82,7 @@ class YoloV5Prediction:
             
             # Transform  box from format (center x, center y, width, height) to format
             # (x1, y1, x2, y2)
-            box = BoxCoordsUtilities.xmymwy(coords = x[:, :4])
+            box = BoxCoordsUtilities.xmymwh2xyxy(coords = x[:, :4])
             
             # Detections matrix nx6 (xyxy, conf, cls index)
             if multi_label:
