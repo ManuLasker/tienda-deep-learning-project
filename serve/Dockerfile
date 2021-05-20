@@ -1,5 +1,4 @@
-FROM continuumio/miniconda3
-
+FROM ubuntu:latest
 
 LABEL maintainer="emanuel.afanador@koombea.com"
 LABEL com.amazonaws.sagemaker.capabilities.accept-bind-to-port=true
@@ -9,7 +8,7 @@ ARG PYTHON_VERSION=3.7
 
 ENV DEBIAN_FRONTEND noninteractive
 
-# System packages
+# System packages 
 RUN apt-get update && apt-get install -y  apt-utils
 RUN apt-get update && apt-get install -y --no-install-recommends nginx \
     curl \
@@ -20,13 +19,30 @@ RUN apt-get update && apt-get install -y --no-install-recommends nginx \
     wget \
     pkg-config 
 
-# Copy nginx config
-COPY config/nginx.conf /opt/ml/input/config/nginx.conf
+# Install miniconda and python
+RUN curl -L -o ~/miniconda.sh https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh \
+    && chmod +x ~/miniconda.sh \
+    && ~/miniconda.sh -b -p /opt/conda \
+    && rm ~/miniconda.sh \
+    && /opt/conda/bin/conda update conda \
+    && /opt/conda/bin/conda install -y \
+        python=$PYTHON_VERSION 
+
+# Add conda to path
+ENV PATH=/opt/conda/bin:${PATH}
 
 # Copy requiremets to container
 COPY config/environment /opt/ml/input/config/environment
+
 # Install environment configuration
-RUN pip install -r /opt/ml/input/config/environment/requirements.txt
+RUN pip install -U pip
+RUN pip install --timeout=1000 -r /opt/ml/input/config/environment/requirements.txt
+RUN pip install --timeout=1000 multi-model-server sagemaker-inference
+RUN pip install --timeout=1000 torch==1.8.1+cpu torchvision==0.9.1+cpu -f https://download.pytorch.org/whl/torch_stable.html
+RUN pip install --timeout=1000 opencv-python-headless
+
+# Copy nginx config
+COPY config/nginx.conf /opt/ml/input/config/nginx.conf
 
 # Define importants env variables
 ENV PYTHONUNBUFFERED=TRUE
