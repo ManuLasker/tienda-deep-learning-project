@@ -4,7 +4,7 @@ LABEL maintainer="emanuel.afanador@koombea.com"
 LABEL com.amazonaws.sagemaker.capabilities.accept-bind-to-port=true
 LABEL com.amazonaws.sagemaker.capabilities.multi-models=true
 
-ARG PYTHON_VERSION=3.7
+ARG PYTHON_VERSION=3.8
 
 ENV DEBIAN_FRONTEND noninteractive
 
