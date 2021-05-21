@@ -10,4 +10,4 @@ if [[ "$rebuild" = "$default" ]]; then
     docker build --rm -t tienda-inference-server . -f Dockerfile
 fi
 
-docker run --rm -p 8080:8080 -v $(pwd)/models:/opt/ml/model -it tienda-inference-server bash
+docker run --rm -p 8080:8080 -v $(pwd)/models:/opt/ml/model -v $(pwd)/src:/opt/ml/code -it tienda-inference-server bash
