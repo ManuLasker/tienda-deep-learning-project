@@ -16,8 +16,7 @@ def health_check_models() -> Generator[None, Tuple[bool, bool], None]:
     try:
         # setup predictors before creating the app
         YoloV5Predictor.setup_model(
-            model_path="/Users/koombea/Desktop/emanuel"
-            "/tienda-deep-learning-project/serve/models/224_mvp.pt",
+            model_path="/opt/ml/model/224_mvp.pt",
             class_names=["items"],
             anchors = [
                 [10,13, 16,30, 33,23], # P3/8
@@ -27,8 +26,7 @@ def health_check_models() -> Generator[None, Tuple[bool, bool], None]:
         )
 
         ClassifierPredictor.setup_model(
-            model_path="/Users/koombea/Desktop/emanuel"
-            "/tienda-deep-learning-project/serve/models/mobilenetv3.pt",
+            model_path="/opt/ml/model/mobilenetv3.pt",
             class_names=["Arroz Doble Vitamor Diana x 500 g",
                         "CocaCola x 250 ml",
                         "Maracuya",
