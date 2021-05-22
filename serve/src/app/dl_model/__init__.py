@@ -1,3 +1,5 @@
+import os
+import json
 from typing import Generator, Tuple
 from app.dl_model.model.predictor import YoloV5Predictor, ClassifierPredictor
 from app.dl_model import YoloV5Predictor, ClassifierPredictor
@@ -16,24 +18,15 @@ def health_check_models() -> Generator[None, Tuple[bool, bool], None]:
     try:
         # setup predictors before creating the app
         YoloV5Predictor.setup_model(
-            model_path="/opt/ml/model/224_mvp.pt",
-            class_names=["items"],
-            anchors = [
-                [10,13, 16,30, 33,23], # P3/8
-                [30,61, 62,45, 59,119], # P4/16
-                [116,90, 156,198, 373,326] # P5/32
-            ]
+            model_path="/opt/ml/model/"+os.environ.get("YOLO_MODEL_NAME"),
+            class_names=json.loads(os.environ.get("YOLO_CLASSES_NAMES")),
+            anchors=json.loads(os.environ.get("ANCHORS"))
         )
 
         ClassifierPredictor.setup_model(
-            model_path="/opt/ml/model/mobilenetv3.pt",
-            class_names=["Arroz Doble Vitamor Diana x 500 g",
-                        "CocaCola x 250 ml",
-                        "Maracuya",
-                        "Chicharrón Americano Jacks x 15 g",
-                        "CocaCola x 400 ml",
-                        "Papas de limón 39gr"],
-            product_external_ids=[29856, 30978, 31742, 32057, 30981, 32191]
+            model_path="/opt/ml/model/"+os.environ.get("CLASSIFICATION_MODEL_NAME"),
+            class_names=json.loads(os.environ.get("CLASSIFICATION_CLASSES_NAMES")),
+            product_external_ids=json.loads(os.environ.get("PRODUCT_EXTERNAL_IDS"))
         )
         yield (YoloV5Predictor.model is not None,
                ClassifierPredictor.model is not None)
