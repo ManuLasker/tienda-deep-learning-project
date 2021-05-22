@@ -1,3 +1,4 @@
 import os
+import json
 
-DEBUG:bool = os.environ.get('DEBUG', True) 
+DEBUG:bool = json.loads(os.environ.get('DEBUG'))
