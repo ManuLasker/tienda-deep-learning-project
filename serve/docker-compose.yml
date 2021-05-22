@@ -1,0 +1,28 @@
+services:
+    tienda_detection_system:
+        image: tienda-inference-server
+        build: .
+        ports:
+            - 8080:8080
+        entrypoint:
+            - serve
+        networks:
+            - tienda_detection_system_network
+        environment:
+            - DEBUG=false
+            - YOLO_MODEL_NAME=224_mvp.pt
+            - YOLO_CLASSES_NAMES=["items"]
+            - ANCHORS=[[10,13, 16,30, 33,23],[30,61, 62,45, 59,119],[116,90, 156,198, 373,326]]
+            - CLASSIFICATION_MODEL_NAME=mobilenetv3.pt
+            - CLASSIFICATION_CLASSES_NAMES=["Arroz Doble Vitamor Diana x 500 g","CocaCola x 250 ml","Maracuya","Chicharrón Americano Jacks x 15 g","CocaCola x 400 ml","Papas de limón 39gr"]
+            - PRODUCT_EXTERNAL_IDS=[29856, 30978, 31742, 32057, 30981, 32191]
+        volumes:
+            - type: bind
+              source: ./src
+              target: /opt/ml/code
+            - type: bind
+              source: ./models
+              target: /opt/ml/model
+
+networks:
+    tienda_detection_system_network:
