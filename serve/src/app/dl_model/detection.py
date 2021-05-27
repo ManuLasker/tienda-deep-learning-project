@@ -53,7 +53,11 @@ class DetectedObject:
         self.class_name = prediction.class_name # update class_name
         self.conf = prediction.conf # update probability
         self.product_id = prediction.product_id # set product external id
-        self.detection_index = prediction.detection_index
+        self.detection_index = prediction.detection_index # set detection index
+        self.top_k_names = prediction.top_k_names # set top k names list
+        self.top_k_indices = prediction.top_k_indices # set top k detection index
+        self.top_k_confidences = prediction.top_k_confidences # set top k confidieces values
+        self.top_k_product_ids = prediction.top_k_product_ids # set top k product external ids
         
     def json(self) -> Dict[str, Any]:
         """Return a nice format for detected object
@@ -66,7 +70,9 @@ class DetectedObject:
                     "detection_index": self.detection_index,
                     "product_name": self.class_name,
                     "confidence": self.conf,
-                    "bounding_box": [int(coord) for coord in self.scale_coordinates.round()]
+                    "bounding_box": [int(coord) for coord in self.scale_coordinates.round()],
+                    "top_k_product_names": self.top_k_names,
+                    "top_k_confidences": self.top_k_confidences
                 }
 
 
@@ -103,7 +109,8 @@ class DetectedObjects:
         from app.dl_model.image import ClassifierInput
         return {
             "total_classes": ClassifierInput.get_total_classes(),
-            "detected_products": [detected_object.json() for detected_object in self.detected_objects]
+            "detected_products": [detected_object.json()
+                                  for detected_object in self.detected_objects]
             }
 
 
