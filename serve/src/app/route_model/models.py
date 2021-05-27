@@ -20,6 +20,8 @@ class DetectedProduct(BaseModel):
     detection_index: int
     confidence: float
     bounding_box: Tuple[int, int, int, int]
+    top_k_product_names: Tuple[str, str, str]
+    top_k_confidences: Tuple[float, float, float]
 
 
 class InvocationRequest(BaseModel):
