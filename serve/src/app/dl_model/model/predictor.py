@@ -120,6 +120,16 @@ class ClassifierPredictor(BasePredictor):
         assert self.model is not None, "Predictor was not set properly"
         
     def predict(self, image_tensor:torch.Tensor):
+        """Predict class producto for image tensor
+
+        Args:
+            image_tensor (torch.Tensor): image tensor of shape [1, c, h, w]
+
+        Returns:
+            [ClassifierPrediction]: classifier prediction namedtuple with 
+                properties product_id, class_name, conf, detection_index,
+                top_k_names, top_k_indices, top_k_product_id, top_k_confidences.
+        """
         self.model.eval()
         with torch.no_grad():
             preds:torch.Tensor = self.model(image_tensor.unsqueeze(0))
@@ -130,19 +140,29 @@ class ClassifierPredictor(BasePredictor):
         with keys 'class_name':, 'conf': 
 
         Args:
-            preds (torch.Tensor): torch Tensor for prediction.
+            preds (torch.Tensor): torch Tensor prediction with shape [1, number_classes].
 
         Returns:
             [ClassifierPrediction]: NamedTuple containing the information about the prediction.
         """
         ClassifierPrediction = namedtuple("ClassifierPrediction",
                                          ["product_id", "class_name",
-                                          "conf", "detection_index"])
-        conf, index = preds.max(dim=1)
+                                          "conf", "detection_index",
+                                          "top_k_names", "top_k_indices",
+                                          "top_k_confidences", "top_k_product_ids"])
+        top_k = 3 # top k predictions values
+        # Using topk to get topk values and indices for predictions
+        conf_values, index_values = map(lambda x: x.view(-1), preds.topk(top_k + 1, dim=1))
+        conf, index = conf_values[0], index_values[0]
+        
         return ClassifierPrediction(product_id=self.product_external_ids[index.item()],
                                     class_name=self.class_names[index.item()],
                                     conf=conf.item(),
-                                    detection_index=index.item())
+                                    detection_index=index.item(),
+                                    top_k_names=[self.class_names[indx] for indx in index_values[1:]],
+                                    top_k_indices=index_values[1:].tolist(),
+                                    top_k_confidences=conf_values[1:].tolist(),
+                                    top_k_product_ids=[self.product_external_ids[indx] for indx in index_values[1:]])
 
     @classmethod
     def setup_model(cls, model_path: str,
