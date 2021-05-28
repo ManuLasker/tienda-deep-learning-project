@@ -3,7 +3,7 @@ services:
         image: tienda-inference-server
         build: .
         ports:
-            - 8080:8080
+            - 2357:8080
         entrypoint:
             - serve
         networks:
