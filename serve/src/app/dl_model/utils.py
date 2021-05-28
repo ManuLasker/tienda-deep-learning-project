@@ -210,6 +210,20 @@ class ImageUtilities:
         if pil_image.mode == "RGBA":
             pil_image.convert("RGB")
         return pil_image
+    
+    def _bytes_to_pil(bytes_image: bytes) -> Image.Image:
+        """Convert bytes image into pil image format.
+
+        Args:
+            bytes_image (bytes): bytes image
+
+        Returns:
+            Image.Image: pil image.
+        """
+        pil_image = Image.open(BytesIO(bytes_image))
+        if pil_image.mode == "RGBA":
+            pil_image.convert("RGB")
+        return pil_image
 
     @staticmethod
     def _load_image_from_base64_image(base64_image: str) -> np.ndarray:
@@ -223,4 +237,18 @@ class ImageUtilities:
         """
         return ImageUtilities._pil_to_numpy(
             ImageUtilities._base64_to_pil(base64_image), _format="BGR"
+        )
+        
+    @staticmethod
+    def _load_image_from_bytes_image(bytes_image: bytes) -> np.ndarray:
+        """Load image from bytes image object to numpy image in BGR format.
+
+        Args:
+            bytes_image (bytes): bytes image object.
+
+        Returns:
+            np.ndarray: numpy image array in BGR format.
+        """
+        return ImageUtilities._pil_to_numpy(
+            ImageUtilities._bytes_to_pil(bytes_image), _format="BGR"
         )
