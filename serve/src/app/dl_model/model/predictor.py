@@ -152,17 +152,18 @@ class ClassifierPredictor(BasePredictor):
                                           "top_k_confidences", "top_k_product_ids"])
         top_k = 3 # top k predictions values
         # Using topk to get topk values and indices for predictions
-        conf_values, index_values = map(lambda x: x.view(-1), preds.topk(top_k + 1, dim=1))
+        conf_values, index_values = map(lambda x: x.view(-1), preds.topk(top_k, dim=1))
         conf, index = conf_values[0], index_values[0]
         
         return ClassifierPrediction(product_id=self.product_external_ids[index.item()],
                                     class_name=self.class_names[index.item()],
                                     conf=conf.item(),
                                     detection_index=index.item(),
-                                    top_k_names=[self.class_names[indx] for indx in index_values[1:]],
-                                    top_k_indices=index_values[1:].tolist(),
-                                    top_k_confidences=conf_values[1:].tolist(),
-                                    top_k_product_ids=[self.product_external_ids[indx] for indx in index_values[1:]])
+                                    top_k_names=[self.class_names[indx] for indx in index_values],
+                                    top_k_indices=index_values.tolist(),
+                                    top_k_confidences=conf_values.tolist(),
+                                    top_k_product_ids=[self.product_external_ids[indx] 
+                                                       for indx in index_values])
 
     @classmethod
     def setup_model(cls, model_path: str,
