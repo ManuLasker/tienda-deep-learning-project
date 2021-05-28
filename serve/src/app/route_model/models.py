@@ -12,6 +12,9 @@ class DetectedProduct(BaseModel):
         detection_index: int,
         confidence: float,
         bounding_box: [x0, y0, x1, y1]
+        top_k_product_names: Tuple[str, str, str]
+        top_k_confidences: Tuple[float, float, float]
+        top_k_product_ids: Tuple[int, int, int]
     }
     """
 
@@ -22,6 +25,7 @@ class DetectedProduct(BaseModel):
     bounding_box: Tuple[int, int, int, int]
     top_k_product_names: Tuple[str, str, str]
     top_k_confidences: Tuple[float, float, float]
+    top_k_product_ids: Tuple[int, int, int]
 
 
 class InvocationRequest(BaseModel):
@@ -48,6 +52,9 @@ class InvocationResponse(BaseModel):
                 detection_index: int,
                 confidence: float,
                 bounding_box: [x0, y0, x1, y1]
+                top_k_product_names: Tuple[str, str, str]
+                top_k_confidences: Tuple[float, float, float]
+                top_k_product_ids: Tuple[int, int, int]
             }
         ]
     }
