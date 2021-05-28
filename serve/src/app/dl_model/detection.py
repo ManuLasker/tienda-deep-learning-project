@@ -70,10 +70,12 @@ class DetectedObject:
                     "detection_index": self.detection_index,
                     "product_name": self.class_name,
                     "confidence": self.conf,
-                    "bounding_box": [int(coord) for coord in self.scale_coordinates.round()],
+                    "bounding_box": [int(coord)
+                                     for coord in self.scale_coordinates.round()],
                     "top_k_product_names": self.top_k_names,
                     "top_k_confidences": self.top_k_confidences,
-                    "top_k_product_ids": self.top_k_product_ids
+                    "top_k_product_ids": self.top_k_product_ids,
+                    "top_k_detection_indices": self.top_k_indices
                 }
 
 
