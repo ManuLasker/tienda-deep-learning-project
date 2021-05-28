@@ -57,6 +57,25 @@ class YoloInput:
         # return yolo input object
         return cls(numpy_image, new_shape)
     
+    @classmethod
+    def from_bytes_image(cls, bytes_image: bytes,
+                         new_shape: Union[Tuple[int, int], int] = (224, 224)) -> 'YoloInput':
+        """Create a yolo input object from a bytes image file object.
+        
+        Args:
+            bytes_image (bytes): bytes image file object.
+            new_shape (Tuple[int, int]): new size for preprocessing.
+        Returns:
+            [YoloInput]: yolo input object. with image and new size.
+        """
+        # Load BGR numpy image array
+        numpy_image = ImageUtilities._load_image_from_bytes_image(bytes_image)
+        # validate new_size 
+        if isinstance(new_shape, int):
+            new_shape = (new_shape, new_shape)
+        # return yolo input object
+        return cls(numpy_image, new_shape)
+    
     def detect_products(self, conf_thres: float = 0.25,
                               iou_thres: float = 0.45,
                               classes: List[str] = None,
