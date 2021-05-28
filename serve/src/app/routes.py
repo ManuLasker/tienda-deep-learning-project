@@ -1,9 +1,11 @@
-from typing import Any, Dict, Tuple
-from fastapi import Depends, HTTPException
+from typing import Tuple
+from fastapi import Depends, HTTPException, File
 from starlette.responses import RedirectResponse
 from app import app
 from app.dl_model import health_check_models
-from app.route_model import InvocationRequest, InvocationResponse, PingResponse
+from app.route_model import (InvocationRequest,
+                             InvocationResponse,
+                             PingResponse)
 from app.dl_model.image import YoloInput
 
 
@@ -42,25 +44,25 @@ def ping(models_check: Tuple[bool, bool] = Depends(health_check_models)):
 
 @app.post("/invocations", response_model=InvocationResponse)
 def invocation(
-    body: InvocationRequest,
+    image: bytes = File(None),
     models_check: Tuple[bool, bool] = Depends(health_check_models),
 ):
-    """Invocation endpoint used by sagemaker, this will execute the yolov5 and classification on an image
-    in base64 format and return the detected products.
+    """Invocation endpoint used by sagemaker, this will execute the yolov5 and 
+    classification on an image uploaded as a multipart/form-data and return the detected products.
     """
     try:
         # Create yolo input object
-        yolo_input = YoloInput.from_base64_image(
-            body.base64_image, new_shape=(224, 224)
+        yolo_input = YoloInput.from_bytes_image(
+            image, new_shape=(224, 224)
         )
         # Detect objects
-        return yolo_input.detect_products(conf_thres=0.1)
+        return yolo_input.detect_products(conf_thres=0.2)
     except Exception as e:
         raise HTTPException(
             status_code=500,
             detail={
                 "error": str(e),
-                "message": "There was an error on the decoding of body payload or in the detections"
-                            ", check your encode base64 image is well encoded",
+                "message": "There was an error on the decoding bytes image or in the detections"
+                            ", check your image file is correct or valid!",
             },
         )
