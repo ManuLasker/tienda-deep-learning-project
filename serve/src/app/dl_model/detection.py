@@ -72,7 +72,8 @@ class DetectedObject:
                     "confidence": self.conf,
                     "bounding_box": [int(coord) for coord in self.scale_coordinates.round()],
                     "top_k_product_names": self.top_k_names,
-                    "top_k_confidences": self.top_k_confidences
+                    "top_k_confidences": self.top_k_confidences,
+                    "top_k_product_ids": self.top_k_product_ids
                 }
 
 
