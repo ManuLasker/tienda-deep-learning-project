@@ -15,6 +15,7 @@ class DetectedProduct(BaseModel):
         top_k_product_names: Tuple[str, str, str]
         top_k_confidences: Tuple[float, float, float]
         top_k_product_ids: Tuple[int, int, int]
+        top_k_detection_indices: Tuple[int, int, int]
     }
     """
 
@@ -26,7 +27,7 @@ class DetectedProduct(BaseModel):
     top_k_product_names: Tuple[str, str, str]
     top_k_confidences: Tuple[float, float, float]
     top_k_product_ids: Tuple[int, int, int]
-
+    top_k_detection_indices: Tuple[int, int, int]
 
 class InvocationRequest(BaseModel):
     """Invocation Request for /invocations endpoint,
@@ -55,6 +56,7 @@ class InvocationResponse(BaseModel):
                 top_k_product_names: Tuple[str, str, str]
                 top_k_confidences: Tuple[float, float, float]
                 top_k_product_ids: Tuple[int, int, int]
+                top_k_detection_indices: Tuple[int, int, int]
             }
         ]
     }
