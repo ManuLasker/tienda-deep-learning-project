@@ -120,7 +120,7 @@ class YoloV5Prediction:
             if (time.time() - t) > time_limit:
                 print(f'WARNING: NMS time limit {time_limit}s exceeded')
                 break  # time limit exceeded
-            def change_classIndex_by_name(out: List[float]):
-                out[-1] = self.__model.class_names[int(out[-1])]
-                return out
-        return list(map(change_classIndex_by_name, output[0]))
+        def change_classIndex_by_name(out: List[float]):
+            out[-1] = self.__model.class_names[int(out[-1])]
+            return out
+        return map(change_classIndex_by_name, output[0]) if output[0] else output
