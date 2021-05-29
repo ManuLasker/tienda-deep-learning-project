@@ -102,6 +102,8 @@ class YoloInput:
         detected_products = DetectedObjects(ImageUtilities._transform_image(self.numpy_image))
         # add detected object
         for pred in predictions:
+            if not pred:
+                return detected_products.json()
             coords = pred[:4]
             conf, class_name = pred[4:] 
             detected_products.add_detected_object(DetectedObject(self.original_size,
