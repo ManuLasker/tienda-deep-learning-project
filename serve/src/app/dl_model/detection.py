@@ -111,6 +111,7 @@ class DetectedObjects:
         """
         from app.dl_model.image import ClassifierInput
         return {
+            "total_detections": len(self.detected_objects),
             "total_classes": ClassifierInput.get_total_classes(),
             "detected_products": [detected_object.json()
                                   for detected_object in self.detected_objects]
