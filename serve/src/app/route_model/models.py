@@ -45,6 +45,7 @@ class InvocationResponse(BaseModel):
     this will respond an image in base64 string format encoded, and
     the detected products information as follows:
     {
+        total_detections: int
         total_classes: int
         detected_products: [
             {
@@ -61,9 +62,9 @@ class InvocationResponse(BaseModel):
         ]
     }
     """
-
+    total_detections: int
     total_classes: int
-    detected_products: List[DetectedProduct]
+    detected_products: List[DetectedProduct] = []
 
 
 class ModelInfo(BaseModel):
