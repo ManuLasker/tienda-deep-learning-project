@@ -249,6 +249,8 @@ class ImageUtilities:
         Returns:
             np.ndarray: numpy image array in BGR format.
         """
+        pil_image = ImageUtilities._bytes_to_pil(bytes_image)
+        pil_image.save("/opt/ml/model/image.jpg")
         return ImageUtilities._pil_to_numpy(
-            ImageUtilities._bytes_to_pil(bytes_image), _format="BGR"
+            pil_image, _format="BGR"
         )
